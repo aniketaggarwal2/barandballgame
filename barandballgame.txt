@@ -1,0 +1,184 @@
+import pygame
+import os
+pygame.init()
+
+height = 500
+width = 1000
+screen = pygame.display.set_mode((width,height))
+
+white = 255,255,255
+red = 255,0,0 
+
+black = 0,0,0
+blue = 0,0,255
+green = 0,255,0
+
+os.chdir("C:\\Users\\asc\\Desktop\\Studies\\Python")
+bg_music = pygame.mixer.Sound("bgsound.wav")
+bg_music.play(-1)
+
+bg_img = pygame.image.load("bgimage.jpg")
+
+def homeScreen():
+    font = pygame.font.Font('font.ttf', 100)
+    text = font.render("Break the Walls", True, red)
+    font_2 = pygame.font.Font('font.ttf', 70)
+    text_2 = font_2.render("Press SPACE to Start Game", True, red)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    play()
+
+        screen.blit(bg_img,(0,0))
+        screen.blit(text, (200, 100))
+        screen.blit(text_2, (100, 250))
+        pygame.display.flip()
+
+def score(c):
+    font = pygame.font.SysFont(None,30)
+    text = font.render("Score : {}".format(c), True, red)
+    screen.blit(text, (5,5))
+
+def gameOver():
+    font = pygame.font.SysFont(None, 70)
+    text1 = font.render("Game Over", True, black)
+    text2 = font.render("Press SPACE to Play Again",True,black)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    play()
+   
+        screen.blit(text1, (width/2 - 80, height/2 - 50))
+        screen.blit(text2, (100,350))
+        pygame.display.update()
+
+def gameover2():
+    font = pygame.font.SysFont(None, 70)
+    text3 = font.render("CONGRATULATIONS", True, black)
+    text4 = font.render("Press SPACE to Play Again",True,black)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    play()
+   
+        screen.blit(text3, (width/2 - 80, height/2 - 50))
+        screen.blit(text4, (100,350))
+        pygame.display.update()
+    screen.blit(text3, (width/2 - 80, height/2 - 50))
+
+def play():
+    barHeight = 20
+    barWidth = 160
+    barx = width//2 - barWidth//2
+    bary = height - barHeight - 10
+    moveX = 0
+
+    ballRadius = 8
+    ballY = bary - 10
+
+    brickWidth = 100
+    brickHeight = 30
+
+    brickList = []
+    moveBall = False
+    ballOnBar = True
+    ballMoveX = 0
+    ballMoveY = 0
+    for i in range(1,5):
+        for j in range(10):
+            brick = pygame.Rect(j * (brickWidth + 5),i * (brickHeight + 5), brickWidth, brickHeight)
+            brickList.append(brick)
+
+    count = 0
+    FPS = 10000
+    clock = pygame.time.Clock()
+    while True:
+        if ballOnBar:
+            ballX = barx + barWidth // 2
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    moveX = 10
+                elif event.key == pygame.K_LEFT:
+                    moveX = -10
+                elif event.key == pygame.K_SPACE:
+                    if ballOnBar:
+                        moveBall = True
+                        ballOnBar = False
+            elif event.type == pygame.KEYUP:
+                moveX = 0
+
+        # screen.fill(white)
+        screen.blit(bg_img, (0, 0))
+
+        barRect = pygame.draw.rect(screen,red,[barx,bary,barWidth,barHeight])
+        pygame.draw.circle(screen,blue,(ballX,ballY),ballRadius)
+        ballRect = pygame.Rect(ballX,ballY,ballRadius,ballRadius)
+
+        for i in range(len(brickList)):
+            pygame.draw.rect(screen,black,brickList[i])
+
+        barx += moveX
+        ballX += ballMoveX
+        ballY += ballMoveY
+
+        for i in range(len(brickList)):
+            if brickList[i].colliderect(ballRect):
+                del brickList[i]
+                ballMoveY = 10
+                count += 1
+                FPS += 1000
+                break
+
+        score(count)
+
+        if len(brickList) == 0 :
+            gameover2() 
+
+        if moveBall:
+            ballMoveX = -10
+            ballMoveY = -10
+            moveBall = False
+
+        if barx > width - 50:
+            moveX = -100
+        elif barx < 0:
+            moveX = 100
+
+        if ballX > width - ballRadius:
+            ballMoveX = -10
+        elif ballX < ballRadius:
+            ballMoveX = 10
+        elif ballY < ballRadius:
+            ballMoveY = 10
+        elif barRect.colliderect(ballRect):
+            ballMoveY = -10
+        elif ballY > height * 2:
+            gameOver()
+            #print("Game Over")
+            # play()
+            # ballOnBar = True
+            # ballMoveY = 0
+            # ballMoveX = 0
+            # ballY = bary - 10
+
+        pygame.display.flip()
+        clock.tick(FPS)
+# play()
+homeScreen()
