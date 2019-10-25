@@ -1,7 +1,7 @@
 import pygame
 import os
 pygame.init()
-
+#determinig the screen area
 height = 500
 width = 1000
 screen = pygame.display.set_mode((width,height))
@@ -12,7 +12,7 @@ red = 255,0,0
 black = 0,0,0
 blue = 0,0,255
 green = 0,255,0
-
+#Getting Music
 os.chdir("C:\\Users\\asc\\Desktop\\Studies\\Python")
 bg_music = pygame.mixer.Sound("bgsound.wav")
 bg_music.play(-1)
